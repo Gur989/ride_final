@@ -348,18 +348,38 @@ elif page == "Prediction":
 
     if st.button("Predict Price"):
 
-        input_data = pd.DataFrame([[distance, hour, temperature, humidity, wind, visibility]],
-                                 columns=["distance","hour","temperature","humidity","windSpeed","visibility"])
+    import numpy as np
 
-        predicted_price = round(model.predict(input_data)[0], 2)
+    input_data = pd.DataFrame([[distance, hour, temperature, humidity, wind, visibility]],
+                             columns=["distance","hour","temperature","humidity","windSpeed","visibility"])
 
-        # R2 Score (confidence)
-        r2 = r2_score(y, model.predict(X))
-        confidence = round(r2 * 100, 2)
+    predicted_price = round(model.predict(input_data)[0], 2)
 
-        col1,col2 = st.columns(2)
+    # ---------------- CONFIDENCE INTERVAL ----------------
+    errors = y - model.predict(X)
+    std_error = np.std(errors)
 
-        col1.metric("Predicted Price", f"${predicted_price}")
-        col2.metric("Model Confidence", f"{confidence}%")
+    # Slider for confidence level
+    confidence_level = st.slider("Select Confidence Level (%)", 80, 99, 95)
+
+    z_dict = {80:1.28, 85:1.44, 90:1.65, 95:1.96, 99:2.58}
+    z = z_dict.get(confidence_level, 1.96)
+
+    margin = z * std_error
+
+    lower_bound = round(predicted_price - margin, 2)
+    upper_bound = round(predicted_price + margin, 2)
+
+    # R2 Score
+    r2 = r2_score(y, model.predict(X))
+    confidence = round(r2 * 100, 2)
+
+    col1,col2,col3 = st.columns(3)
+
+    col1.metric("Predicted Price", f"${predicted_price}")
+    col2.metric("Model Confidence (R²)", f"{confidence}%")
+    col3.metric("Confidence Interval", f"${lower_bound} - ${upper_bound}")
+
+    st.success("Prediction Generated Successfully ")
 
         st.success("Prediction Generated Successfully ")
