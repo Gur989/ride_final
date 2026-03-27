@@ -79,7 +79,7 @@ if not st.session_state.login:
 # ---------------- LOAD DATA ----------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("new_rider_share10.csv")
+    df = pd.read_csv("data/new_rider_share10.csv")
     df["short_summary"] = df["short_summary"].str.strip()
     return df
 
