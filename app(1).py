@@ -315,9 +315,20 @@ elif page == "Surge Pricing":
    
 
 # ---------------- PAGE 4 ----------------
+
+# ---------------- PAGE 4 ----------------
 elif page == "Prediction":
 
     st.subheader("🤖 Ride Price Prediction")
+
+    from sklearn.linear_model import LinearRegression
+
+    # Train model
+    X = df[["distance","hour","temperature","humidity","windSpeed","visibility"]]
+    y = df["price"]
+
+    model = LinearRegression()
+    model.fit(X, y)
 
     col1,col2,col3 = st.columns(3)
 
@@ -337,14 +348,14 @@ elif page == "Prediction":
 
     if st.button("Predict Price"):
 
-        base_price = distance * 3
-        weather_factor = 1.2 if "Rain" in weather else 1
-        temp_factor = temperature / 50
+        input_data = pd.DataFrame([[distance, hour, temperature, humidity, wind, visibility]],
+                                 columns=["distance","hour","temperature","humidity","windSpeed","visibility"])
 
-        predicted_price = round(base_price * weather_factor * (1 + temp_factor),2)
+        predicted_price = round(model.predict(input_data)[0], 2)
 
-        r2 = r2_score(df_pred["Actual_Price"], df_pred["Predicted_RF"])
-        confidence = round(r2 * 100,2)
+        # R2 Score (confidence)
+        r2 = r2_score(y, model.predict(X))
+        confidence = round(r2 * 100, 2)
 
         col1,col2 = st.columns(2)
 
