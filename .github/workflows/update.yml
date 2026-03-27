@@ -1,33 +1,21 @@
-name: Data Pipeline
+name: Auto Update Data
 
 on:
-  schedule:
-    - cron: '0 0 */14 * *'   # every 14 days
-  workflow_dispatch:         # ⭐ THIS CREATES BUTTON
+  workflow_dispatch:
 
 jobs:
-  update-data:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install Dependencies
-        run: pip install pandas
+      - run: python --version   # ✅ debug step
 
-      - name: Run Pipeline
-        run: python update_data.py
+      - run: pip install -r requirements.txt
 
-      - name: Commit Changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Auto/Manual Data Update" || echo "No changes"
-          git push
+      - run: python update_data.py
