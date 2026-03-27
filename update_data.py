@@ -1,7 +1,7 @@
 from feature_engineering import process_data
 
 def run_pipeline():
-    file_path = "new_rider_share10.csv"
+    file_path = "data/new_rider_share10.csv"
 
     print("Running automation...")
 
