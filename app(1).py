@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 import zipfile
 from sklearn.metrics import r2_score
+from feature_engineering import process_data
 
 st.set_page_config(page_title="Rides Analytics", layout="wide")
 
@@ -108,6 +109,25 @@ cab = st.sidebar.multiselect("Cab Type", df["cab_type"].unique(), df["cab_type"]
 
 df = df[(df["month"].isin(month)) & (df["cab_type"].isin(cab))]
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("🔄 Manual Data Update")
+
+uploaded_file = st.sidebar.file_uploader("Upload New Dataset")
+
+if uploaded_file is not None:
+    file_path = "new_rider_share10.csv"
+
+    # Save uploaded file
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    # Run Feature Engineering
+    process_data(file_path)
+
+    st.sidebar.success("✅ Data updated & processed successfully!")
+
+    # Refresh cache
+    st.cache_data.clear()
 # ---------------- PAGE 1 ----------------
 if page == "Timing Analysis":
 
